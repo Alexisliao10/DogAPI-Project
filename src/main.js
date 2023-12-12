@@ -39,38 +39,10 @@ async function fetchData(url) {
   return data;
 }
 
-// async function getDog() {
-//   try {
-//     const data = await fetchData(API_URL_RANDOM);
-//     let images = data
-//       .map(
-//         (item, count) => `
-//       <figure>
-//       <img width="300px" src="${item.url}" alt="" />
-//       <figcaption>${item.breeds[0].name}</figcaption>
-//       <button class="like-button" data-index="${count}">Love it!</button>
-//       </figure>
-//       `,
-//       )
-//       .join("");
-
-//     container.addEventListener("click", (event) => {
-//       if (event.target.classList.contains("like-button")) {
-//         const index = parseInt(event.target.dataset.index, 10);
-//         addFavourites(data[index].id);
-//       }
-//     });
-//     container.innerHTML = images;
-//   } catch (error) {
-//     throw new Error(error.message);
-//   }
-// }
-
-let currentData; // Variable global para almacenar la última data
+let currentData;
 
 async function getDog() {
   try {
-    // Desvincula el evento antes de actualizar el contenido
     container.removeEventListener("click", handleLikeButtonClick);
 
     currentData = await fetchData(API_URL_RANDOM);
@@ -88,14 +60,12 @@ async function getDog() {
 
     container.innerHTML = images;
 
-    // Vincula el evento después de actualizar el contenido
     container.addEventListener("click", handleLikeButtonClick);
   } catch (error) {
     throw new Error(error.message);
   }
 }
 
-// Función para manejar el click en el botón "Love it!"
 function handleLikeButtonClick(event) {
   if (event.target.classList.contains("like-button")) {
     const index = parseInt(event.target.dataset.index, 10);
@@ -113,8 +83,6 @@ async function getFavourites() {
     if (favouriteDogs.length === 0) {
       favouriteDogs.push(...data);
       renderFavourite();
-    } else {
-      console.log("array no vacio");
     }
   } catch (error) {
     throw new Error(error);
