@@ -1,3 +1,10 @@
+const api = axios.create({
+  baseURL: "https://api.thedogapi.com/v1",
+});
+
+api.defaults.headers.common["x-api-key"] =
+  "live_t82KCAtGjQe9jDk6CbCj1FKlE2NtCk54qs0YZze3tuAweaKonMrgYQpCwU759VQ7";
+
 queryString = "?limit=3&has_breeds=1";
 
 const API_URL_RANDOM = `https://api.thedogapi.com/v1/images/search${queryString}`;
@@ -39,37 +46,41 @@ async function fetchData(url) {
   return data;
 }
 
-let currentData;
+let randomDogs;
 
 async function getDog() {
-  try {
-    container.removeEventListener("click", handleLikeButtonClick);
+  container.removeEventListener("click", handleLikeButtonClick);
 
-    currentData = await fetchData(API_URL_RANDOM);
-    let images = currentData
-      .map(
-        (item, count) => `
+  randomDogs = await (async () => {
+    try {
+      const res = await api.get(`/images/search${queryString}`);
+      return res.data;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  })();
+  // randomDogs1 = await fetchData(API_URL_RANDOM);
+  console.log(randomDogs);
+  let images = randomDogs
+    .map(
+      (item, count) => `
       <figure>
       <img width="300px" src="${item.url}" alt="" />
       <figcaption>${item.breeds[0].name}</figcaption>
       <button class="like-button" data-index="${count}">Love it!</button>
       </figure>
       `,
-      )
-      .join("");
+    )
+    .join("");
 
-    container.innerHTML = images;
-
-    container.addEventListener("click", handleLikeButtonClick);
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  container.innerHTML = images;
+  container.addEventListener("click", handleLikeButtonClick);
 }
 
 function handleLikeButtonClick(event) {
   if (event.target.classList.contains("like-button")) {
     const index = parseInt(event.target.dataset.index, 10);
-    addFavourites(currentData[index].id);
+    addFavourites(randomDogs[index].id);
   }
 }
 
@@ -79,7 +90,8 @@ title.textContent = "Your favorite doggos";
 
 async function getFavourites() {
   try {
-    const data = await fetchData(API_URL_FAVOURITE);
+    const { data } = await api.get("/favourites");
+    // const data = await fetchData(API_URL_FAVOURITE);
     if (favouriteDogs.length === 0) {
       favouriteDogs.push(...data);
       renderFavourite();
@@ -116,20 +128,23 @@ function renderFavourite() {
 
 async function addFavourites(id) {
   try {
-    const response = await fetch(API_URL_FAVOURITE, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        image_id: id,
-      }),
+    const { data, status } = await api.post("/favourites", {
+      image_id: id,
     });
+    // const response = await fetch(API_URL_FAVOURITE, {
+    //   method: "POST",
+    //   headers: headers,
+    //   body: JSON.stringify({
+    //     image_id: id,
+    //   }),
+    // });
 
-    if (response.status === 200) {
-      favouriteDogs.length = 0;
+    if (status === 200) {
+      favouriteDogs.length = [];
       console.log("Saved to favourites");
       getFavourites();
     } else {
-      console.log("Failed to add to favourites");
+      console.log("Failed to add to favourites", data.message);
     }
   } catch (error) {
     throw new Error(error.message);
@@ -138,16 +153,17 @@ async function addFavourites(id) {
 
 async function removeFavorite(id) {
   try {
-    const response = await fetch(API_URL_FAVOURITE + `/${id}`, {
-      method: "DELETE",
-      headers: headers,
-    });
-    if (response.status === 200) {
-      favouriteDogs.length = 0;
+    const res = await api.delete(`/favourites/${id}`);
+    // const response = await fetch(API_URL_FAVOURITE + `/${id}`, {
+    //   method: "DELETE",
+    //   headers: headers,
+    // });
+    if (res.status === 200) {
+      favouriteDogs.length = [];
       await new Promise((resolve) => setTimeout(resolve(getFavourites()), 500));
       console.log("Deleted from favorites");
     } else {
-      spanError.innerText = "There's an error: " + response.status;
+      spanError.innerText = "There's an error: " + res.status;
     }
   } catch (error) {
     throw new Error(error);
