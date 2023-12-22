@@ -7,21 +7,21 @@ api.defaults.headers.common["x-api-key"] =
 
 queryString = "?limit=3&has_breeds=1";
 
-const API_URL_RANDOM = `https://api.thedogapi.com/v1/images/search${queryString}`;
-const API_URL_FAVOURITE = `https://api.thedogapi.com/v1/favourites`;
+// const API_URL_RANDOM = `https://api.thedogapi.com/v1/images/search${queryString}`;
+// const API_URL_FAVOURITE = `https://api.thedogapi.com/v1/favourites`;
 
-const apiKey =
-  "live_t82KCAtGjQe9jDk6CbCj1FKlE2NtCk54qs0YZze3tuAweaKonMrgYQpCwU759VQ7";
+// const apiKey =
+//   "live_t82KCAtGjQe9jDk6CbCj1FKlE2NtCk54qs0YZze3tuAweaKonMrgYQpCwU759VQ7";
 
-const headers = {
-  "content-type": "application/json",
-  "x-api-key": apiKey,
-};
+// const headers = {
+//   "content-type": "application/json",
+//   "x-api-key": apiKey,
+// };
 
-const options = {
-  method: "GET",
-  headers: headers,
-};
+// const options = {
+//   method: "GET",
+//   headers: headers,
+// };
 
 const container = document.querySelector("#container");
 const nextDog = document.querySelector("#reload");
